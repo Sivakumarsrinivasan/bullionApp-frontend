@@ -10,9 +10,9 @@ import {
 } from './tokenStorage';
 
 import {navigateToLogin} from '../navigations/navigationRef';
-
+import Config from 'react-native-config';
 const BASE_URL =
-  'http://localhost:8000/api/v1/';
+  Config.API_BASE_URL;
 
 const api = axios.create({
   baseURL: BASE_URL,
