@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+
+# npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Metro
+.metro-health-check*
+
+# React Native
+*.log
+
+# Android
+android/.gradle/
+android/build/
+android/app/build/
+android/.idea/
+android/local.properties
+
+# Android generated files
+*.apk
+*.aab
+
+# Keystore / signing files
+*.keystore
+*.jks
+
+# Gradle
+.gradle/
+
+# IDE
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Coverage
+coverage/
+
+# React Native cache
+.cache/
+
+# TypeScript
+*.tsbuildinfo
