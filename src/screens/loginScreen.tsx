@@ -169,7 +169,11 @@ const handleSendOtp = async () => {
     });
   } catch (error: any) {
     // console.log('Login Send OTP error:', error);
-
+  console.log("========== API ERROR ==========");
+  console.log("MESSAGE:", error?.message);
+  console.log("STATUS:", error?.response?.status);
+  console.log("DATA:", JSON.stringify(error?.response?.data));
+  console.log("==============================");
     const message =
       error?.response?.data?.message ||
       'Something went wrong. Please try again.';
