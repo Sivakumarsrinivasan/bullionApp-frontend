@@ -1,3 +1,4 @@
+import Config from 'react-native-config';
 import { CompleteRegistrationRequest, SendOtpRequest, VerifyRegistrationOtpRequest } from '../types/auth';
 import api from './api';
 import authApi from './authapi';
@@ -48,6 +49,9 @@ export const completeRegistration = async (
 export const sendLoginOtp = async (
   data: SendOtpRequest,
 ) => {
+  const BASE_URL = Config.API_BASE_URL;
+
+console.log("API BASE URL:", BASE_URL)
   const response = await authApi.post(
     'auth/login/send-otp',
     data,
