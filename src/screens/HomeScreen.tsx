@@ -195,79 +195,57 @@ const HomeScreen = ({navigation}: Props) => {
   // Logout
   // =========================
 
-  const handleLogout = () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              console.log(
-                'LOGOUT STARTED',
-              );
+ const handleLogout = () => {
+  Alert.alert(
+    'Logout',
+    'Are you sure you want to logout?',
+    [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Logout',
+        style: 'destructive',
+        onPress: async () => {
+          let serverLogoutSucceeded = false;
+          let serverMessage = '';
 
-              const tokens =
-                await getTokens();
+          try {
+            const tokens = await getTokens();
 
-              if (!tokens?.refreshToken) {
-                throw new Error(
-                  'Refresh token not found',
-                );
-              }
-
-              const response =
-                await logout(
-                  tokens.refreshToken,
-                );
-
-              console.log(
-                'LOGOUT RESPONSE:',
-                response,
-              );
-
-              await clearTokens();
-
-              Toast.show({
-                type: 'success',
-                text1: 'Logout Successful',
-                text2:
-                  response?.message ||
-                  'You have been logged out successfully',
-              });
-
-              navigation.replace('Login');
-            } catch (error: any) {
-              Toast.show({
-                type: 'error',
-                text1: 'Logout',
-                text2:
-                  error?.response?.data
-                    ?.message ||
-                  'Logged out successfully',
-              });
-
-              console.log(
-                'LOGOUT ERROR:',
-                error?.response?.data ||
-                  error?.message,
-              );
-
-              await clearTokens();
-
-              navigation.replace('Login');
+            if (tokens?.refreshToken) {
+              const response = await logout(tokens.refreshToken);
+              serverLogoutSucceeded = true;
+              serverMessage =
+                response?.message ||
+                'You have been logged out successfully';
             }
-          },
+          } catch (error: any) {
+            console.log(
+              'LOGOUT ERROR:',
+              error?.response?.data || error?.message,
+            );
+          } finally {
+            // Always clear the local session.
+            await clearTokens();
+            navigation.replace('Login');
+          }
+
+          Toast.show({
+            type: serverLogoutSucceeded ? 'success' : 'info',
+            text1: serverLogoutSucceeded
+              ? 'Logout Successful'
+              : 'Logged out on this device',
+            text2: serverLogoutSucceeded
+              ? serverMessage
+              : 'Your local session was cleared. Server logout could not be confirmed.',
+          });
         },
-      ],
-    );
-  };
+      },
+    ],
+  );
+};
 
   // =========================
   // Logout All Devices
@@ -690,7 +668,7 @@ const HomeScreen = ({navigation}: Props) => {
         {/* =========================
             QUICK TRADE
         ========================= */}
-
+{/* 
         <View
           style={styles.sectionHeader}>
 
@@ -802,7 +780,7 @@ const HomeScreen = ({navigation}: Props) => {
 
           </TouchableOpacity>
 
-        </View>
+        </View> */}
 
 
         {/* =========================
