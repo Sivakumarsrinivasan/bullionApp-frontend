@@ -13,6 +13,7 @@ import {RootStackParamList} from '../navigations/AppNavigator';
 import {useTheme} from '../theme/ThemeProvider';
 import {getOrder} from '../types/order';
 import {getMyOrders} from '../services/order.service';
+import { spacing } from '../theme/spacing';
 
 type Props = NativeStackScreenProps<
   RootStackParamList,
@@ -230,172 +231,195 @@ const MyOrdersScreen = ({navigation}: Props) => {
         )}
 
         {/* Orders */}
-        {!loading &&
-          error === '' &&
-          filteredOrders.length > 0 &&
-          filteredOrders.map(order => (
-            <View
-              key={order.id}
+
+{!loading &&
+  error === '' &&
+  filteredOrders.length > 0 &&
+  filteredOrders.map(order => (
+    <View
+      key={order.id}
+      style={[
+        styles.orderCard,
+        {
+          backgroundColor: colors.card,
+          borderColor: colors.border,
+        },
+      ]}>
+
+      {/* Header */}
+      <View style={styles.orderTopRow}>
+
+        <View style={styles.productInfo}>
+          <View
+            style={[
+              styles.productIcon,
+              {
+                backgroundColor:
+                  order.order_type === 'BUY'
+                    ? colors.primaryLight
+                    : colors.surface,
+              },
+            ]}>
+            <Text style={styles.productIconText}>
+              {order.order_type === 'BUY' ? '↗' : '↘'}
+            </Text>
+          </View>
+
+          <View style={styles.productNameContainer}>
+            <Text
               style={[
-                styles.orderCard,
-                {
-                  backgroundColor: colors.card,
-                  borderColor: colors.border,
-                },
+                styles.productName,
+                {color: colors.text},
+              ]}
+              numberOfLines={1}>
+              {order.product_name}
+            </Text>
+
+            <Text
+              style={[
+                styles.orderDate,
+                {color: colors.textSecondary},
               ]}>
+              {formatDate(order.created_at)}
+            </Text>
+              <Text
+    style={[
+      styles.orderIdText,
+      {color: colors.textSecondary},
+    ]}>
+    Order ID: #{order.id}
+  </Text>
+          </View>
+          
+        </View>
 
-              {/* Top row */}
-              <View style={styles.orderHeader}>
-                <View>
-                  <Text
-                    style={[
-                      styles.orderId,
-                      {color: colors.text},
-                    ]}>
-                    Order #{order.id}
-                  </Text>
+        {/* BUY / SELL */}
+        <View
+          style={[
+            styles.typeBadge,
+            {
+              backgroundColor:
+                order.order_type === 'BUY'
+                  ? colors.primaryLight
+                  : colors.surface,
+            },
+          ]}>
+          <Text
+            style={[
+              styles.typeText,
+              {
+                color:
+                  order.order_type === 'BUY'
+                    ? colors.primary
+                    : colors.textSecondary,
+              },
+            ]}>
+            {order.order_type}
+          </Text>
+        </View>
+      </View>
 
-                  <Text
-                    style={[
-                      styles.orderDate,
-                      {color: colors.textSecondary},
-                    ]}>
-                    {formatDate(order.created_at)}
-                  </Text>
-                </View>
+      {/* Details */}
+      <View
+        style={[
+          styles.detailsContainer,
+          {borderTopColor: colors.border},
+        ]}>
 
-                <View
-                  style={[
-                    styles.typeBadge,
-                    {
-                      backgroundColor:
-                        order.order_type === 'BUY'
-                          ? colors.primaryLight
-                          : colors.surface,
-                    },
-                  ]}>
-                  <Text
-                    style={[
-                      styles.typeText,
-                      {
-                        color:
-                          order.order_type === 'BUY'
-                            ? colors.primary
-                            : colors.textSecondary,
-                      },
-                    ]}>
-                    {order.order_type}
-                  </Text>
-                </View>
-              </View>
+        <View style={styles.detailItem}>
+          <Text
+            style={[
+              styles.detailLabel,
+              {color: colors.textSecondary},
+            ]}>
+            Quantity
+          </Text>
 
-              {/* Product */}
-              <View
-                style={[
-                  styles.productSection,
-                  {borderColor: colors.border},
-                ]}>
-                <Text
-                  style={[
-                    styles.productLabel,
-                    {color: colors.textSecondary},
-                  ]}>
-                  Product
-                </Text>
+          <Text
+            style={[
+              styles.detailValue,
+              {color: colors.text},
+            ]}>
+            {formatQuantity(order.quantity)}
+          </Text>
+        </View>
 
-                <Text
-                  style={[
-                    styles.productValue,
-                    {color: colors.text},
-                  ]}>
-                  Product #{order.product_id}
-                </Text>
-              </View>
+        <View style={styles.verticalDivider} />
 
-              {/* Order details */}
-              <View style={styles.detailsContainer}>
+        <View style={styles.detailItem}>
+          <Text
+            style={[
+              styles.detailLabel,
+              {color: colors.textSecondary},
+            ]}>
+            Price
+          </Text>
 
-                <View style={styles.detailItem}>
-                  <Text
-                    style={[
-                      styles.detailLabel,
-                      {color: colors.textSecondary},
-                    ]}>
-                    Quantity
-                  </Text>
+          <Text
+            style={[
+              styles.detailValue,
+              {color: colors.text},
+            ]}>
+            ₹{formatPrice(order.price)}
+          </Text>
+        </View>
+      </View>
 
-                  <Text
-                    style={[
-                      styles.detailValue,
-                      {color: colors.text},
-                    ]}>
-                    {formatQuantity(order.quantity)}
-                  </Text>
-                </View>
+      {/* Total */}
+      <View
+        style={[
+          styles.totalSection,
+          {borderTopColor: colors.border},
+        ]}>
 
-                <View style={styles.detailItem}>
-                  <Text
-                    style={[
-                      styles.detailLabel,
-                      {color: colors.textSecondary},
-                    ]}>
-                    Price
-                  </Text>
+        <View>
+          <Text
+            style={[
+              styles.totalLabel,
+              {color: colors.textSecondary},
+            ]}>
+            Total Amount
+          </Text>
 
-                  <Text
-                    style={[
-                      styles.detailValue,
-                      {color: colors.text},
-                    ]}>
-                    ₹{formatPrice(order.price)}
-                  </Text>
-                </View>
+          <Text
+            style={[
+              styles.totalValue,
+              {color: colors.primary},
+            ]}>
+            ₹{formatPrice(order.total_amount)}
+          </Text>
+        </View>
 
-              </View>
+        {/* Status */}
+        <View
+          style={[
+            styles.statusBadge,
+            {
+              backgroundColor: colors.primaryLight,
+            },
+          ]}>
+          <View
+            style={[
+              styles.statusDot,
+              {
+                backgroundColor: colors.success,
+              },
+            ]}
+          />
 
-              {/* Total */}
-              <View
-                style={[
-                  styles.totalSection,
-                  {borderColor: colors.border},
-                ]}>
-                <Text
-                  style={[
-                    styles.totalLabel,
-                    {color: colors.textSecondary},
-                  ]}>
-                  Total Amount
-                </Text>
+          <Text
+            style={[
+              styles.statusValue,
+              {color: colors.success},
+            ]}>
+            {getStatusText(order.status)}
+          </Text>
+        </View>
+      </View>
+    </View>
+  ))}
 
-                <Text
-                  style={[
-                    styles.totalValue,
-                    {color: colors.primary},
-                  ]}>
-                  ₹{formatPrice(order.total_amount)}
-                </Text>
-              </View>
 
-              {/* Status */}
-              <View style={styles.statusRow}>
-                <Text
-                  style={[
-                    styles.statusLabel,
-                    {color: colors.textSecondary},
-                  ]}>
-                  Status
-                </Text>
-
-                <Text
-                  style={[
-                    styles.statusValue,
-                    {color: colors.success},
-                  ]}>
-                  {getStatusText(order.status)}
-                </Text>
-              </View>
-            </View>
-          ))}
 
         {/* No orders */}
         {!loading &&
@@ -450,6 +474,144 @@ const MyOrdersScreen = ({navigation}: Props) => {
 };
 
 const styles = StyleSheet.create({
+  orderIdText: {
+  fontSize: 10,
+  marginTop: 3,
+  fontWeight: '600',
+},
+orderCard: {
+  borderRadius: 20,
+  borderWidth: 1,
+  padding: spacing.lg,
+  marginBottom: spacing.md,
+  shadowOffset: {
+    width: 0,
+    height: 4,
+  },
+  shadowOpacity: 0.06,
+  shadowRadius: 10,
+  elevation: 2,
+},
+
+orderTopRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+},
+
+productInfo: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  flex: 1,
+},
+
+productIcon: {
+  width: 46,
+  height: 46,
+  borderRadius: 14,
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+
+productIconText: {
+  fontSize: 23,
+  fontWeight: '800',
+},
+
+productNameContainer: {
+  flex: 1,
+  marginLeft: 12,
+},
+
+productName: {
+  fontSize: 16,
+  fontWeight: '800',
+},
+
+orderDate: {
+  fontSize: 11,
+  marginTop: 4,
+},
+
+typeBadge: {
+  paddingHorizontal: 11,
+  paddingVertical: 6,
+  borderRadius: 10,
+},
+
+typeText: {
+  fontSize: 11,
+  fontWeight: '800',
+},
+
+detailsContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginTop: spacing.lg,
+  paddingTop: spacing.md,
+  borderTopWidth: 1,
+},
+
+detailItem: {
+  flex: 1,
+},
+
+detailLabel: {
+  fontSize: 11,
+  marginBottom: 5,
+},
+
+detailValue: {
+  fontSize: 14,
+  fontWeight: '700',
+},
+
+verticalDivider: {
+  width: 1,
+  height: 32,
+  // backgroundColor: colors.border,
+  marginHorizontal: spacing.md,
+},
+
+totalSection: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  marginTop: spacing.lg,
+  paddingTop: spacing.md,
+  borderTopWidth: 1,
+},
+
+totalLabel: {
+  fontSize: 11,
+  marginBottom: 4,
+},
+
+totalValue: {
+  fontSize: 19,
+  fontWeight: '900',
+},
+
+statusBadge: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  paddingHorizontal: 10,
+  paddingVertical: 7,
+  borderRadius: 10,
+},
+
+statusDot: {
+  width: 7,
+  height: 7,
+  borderRadius: 4,
+  marginRight: 6,
+},
+
+statusValue: {
+  fontSize: 11,
+  fontWeight: '800',
+},
+
   container: {
     flex: 1,
   },
@@ -549,12 +711,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  orderCard: {
-    borderWidth: 1,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-  },
+
 
   orderHeader: {
     flexDirection: 'row',
@@ -567,21 +724,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  orderDate: {
-    fontSize: 12,
-    marginTop: 4,
-  },
 
-  typeBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 20,
-  },
 
-  typeText: {
-    fontSize: 12,
-    fontWeight: '700',
-  },
+
 
   productSection: {
     borderTopWidth: 1,
@@ -601,42 +746,42 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  detailsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
+  // detailsContainer: {
+  //   flexDirection: 'row',
+  //   justifyContent: 'space-between',
+  // },
 
-  detailItem: {
-    flex: 1,
-  },
+  // detailItem: {
+  //   flex: 1,
+  // },
 
-  detailLabel: {
-    fontSize: 12,
-    marginBottom: 5,
-  },
+  // detailLabel: {
+  //   fontSize: 12,
+  //   marginBottom: 5,
+  // },
 
-  detailValue: {
-    fontSize: 15,
-    fontWeight: '600',
-  },
+  // detailValue: {
+  //   fontSize: 15,
+  //   fontWeight: '600',
+  // },
 
-  totalSection: {
-    borderTopWidth: 1,
-    marginTop: 16,
-    paddingTop: 14,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
+  // totalSection: {
+  //   borderTopWidth: 1,
+  //   marginTop: 16,
+  //   paddingTop: 14,
+  //   flexDirection: 'row',
+  //   justifyContent: 'space-between',
+  //   alignItems: 'center',
+  // },
 
-  totalLabel: {
-    fontSize: 14,
-  },
+  // totalLabel: {
+  //   fontSize: 14,
+  // },
 
-  totalValue: {
-    fontSize: 18,
-    fontWeight: '700',
-  },
+  // totalValue: {
+  //   fontSize: 18,
+  //   fontWeight: '700',
+  // },
 
   statusRow: {
     flexDirection: 'row',
@@ -648,10 +793,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
 
-  statusValue: {
-    fontSize: 13,
-    fontWeight: '700',
-  },
+  // statusValue: {
+  //   fontSize: 13,
+  //   fontWeight: '700',
+  // },
 
   emptyContainer: {
     alignItems: 'center',

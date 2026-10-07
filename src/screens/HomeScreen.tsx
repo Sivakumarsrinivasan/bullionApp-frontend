@@ -21,7 +21,7 @@ import {getLatestMarketRates} from '../services/marketRate.service';
 import {ProductRate} from '../types/product';
 import {MarketRate} from '../types/marketRate';
 
-import {logout, logoutAll} from '../services/authService';
+import {logout, logoutAll, getCurrentUser} from '../services/authService';
 import {clearTokens, getTokens} from '../services/tokenStorage';
 
 import Toast from 'react-native-toast-message';
@@ -47,7 +47,7 @@ const HomeScreen = ({navigation}: Props) => {
   const [rates, setRates] = useState<ProductRate[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
-
+const [username, setUsername] = useState("");
   // =========================
   // Market Rate State
   // =========================
@@ -127,6 +127,7 @@ const HomeScreen = ({navigation}: Props) => {
   // =========================
 
   useEffect(() => {
+    loadUser()
     loadRates();
     loadMarketRates();
   }, []);
@@ -176,7 +177,15 @@ const HomeScreen = ({navigation}: Props) => {
       },
     );
   };
+const loadUser = async () => {
+  try {
+    const response = await getCurrentUser();
 
+    setUsername(response.data.data.name);
+  } catch (error) {
+    console.error("Failed to load user", error);
+  }
+};
   // =========================
   // Format Unit
   // =========================
@@ -541,7 +550,7 @@ const HomeScreen = ({navigation}: Props) => {
               style={styles.nameRow}>
               <Text
                 style={styles.userName}>
-                Sivakumar
+                {username}
               </Text>
 
               <Text
@@ -804,14 +813,19 @@ const HomeScreen = ({navigation}: Props) => {
             </Text>
           </View>
 
-          <View
+          {/* <View
             style={styles.countBadge}>
             <Text
               style={styles.countText}>
               {rates.length}
             </Text>
-          </View>
-
+          </View> */}
+<TouchableOpacity
+  activeOpacity={0.8}
+  style={styles.ordersHeaderButton}
+  onPress={() => navigation.navigate('MyOrders')}>
+  <Text style={styles.ordersHeaderIcon}>🛒</Text>
+</TouchableOpacity>
         </View>
 
 
@@ -1010,7 +1024,7 @@ const HomeScreen = ({navigation}: Props) => {
             MY ORDERS
         ========================= */}
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           activeOpacity={0.88}
           style={
             styles.ordersCard
@@ -1064,7 +1078,7 @@ const HomeScreen = ({navigation}: Props) => {
             </Text>
           </View>
 
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
 
         {/* =========================
@@ -1137,14 +1151,23 @@ const createStyles = (colors: any) =>
         colors.background,
     },
 
-    content: {
-      paddingHorizontal:
-        spacing.xl,
-      paddingTop: spacing.lg,
-      paddingBottom:
-        spacing.xxxl,
-    },
+  content: {
+  paddingHorizontal: spacing.xl,
+  paddingTop: spacing.xl + 50,
+  paddingBottom: spacing.xxxl,
+},
+ordersHeaderButton: {
+  width: 42,
+  height: 42,
+  borderRadius: 21,
+  backgroundColor: colors.primaryLight,
+  alignItems: 'center',
+  justifyContent: 'center',
+},
 
+ordersHeaderIcon: {
+  fontSize: 20,
+},
 
     // =========================
     // Header

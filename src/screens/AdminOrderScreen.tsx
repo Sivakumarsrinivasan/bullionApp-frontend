@@ -27,6 +27,7 @@ type Props = NativeStackScreenProps<
 
 type Order = {
   id: number;
+  customer_name:string;
   user_id: number;
   product_id: number;
   product_name: string;
@@ -210,46 +211,64 @@ const AdminOrdersScreen = ({
         ]}>
 
         {/* Header */}
-        <View style={styles.cardHeader}>
-          <View>
-            <Text
-              style={[
-                styles.orderId,
-                {color: colors.text},
-              ]}>
-              Order #{item.id}
-            </Text>
+       {/* Header */}
+<View style={styles.cardHeader}>
+  <View style={styles.headerLeft}>
+    <Text
+      style={[
+        styles.orderId,
+        {color: colors.text},
+      ]}>
+      Order #{item.id}
+    </Text>
 
-            <Text
-              style={[
-                styles.date,
-                {color: colors.textSecondary},
-              ]}>
-              {new Date(
-                item.created_at,
-              ).toLocaleString()}
-            </Text>
-          </View>
+    <Text
+      style={[
+        styles.date,
+        {color: colors.textSecondary},
+      ]}>
+      {new Date(item.created_at).toLocaleString()}
+    </Text>
 
-          <View
-            style={[
-              styles.statusBadge,
-              {
-                backgroundColor:
-                  statusStyle.backgroundColor,
-              },
-            ]}>
-            <Text
-              style={[
-                styles.statusText,
-                {
-                  color: statusStyle.color,
-                },
-              ]}>
-              {item.status}
-            </Text>
-          </View>
-        </View>
+    {/* Customer */}
+    <View style={styles.customerRow}>
+      <Text
+        style={[
+          styles.customerLabel,
+          {color: colors.textSecondary},
+        ]}>
+        Customer
+      </Text>
+
+      <Text
+        style={[
+          styles.customerName,
+          {color: colors.text},
+        ]}
+        numberOfLines={1}>
+        {item.customer_name}
+      </Text>
+    </View>
+  </View>
+
+  <View
+    style={[
+      styles.statusBadge,
+      {
+        backgroundColor: statusStyle.backgroundColor,
+      },
+    ]}>
+    <Text
+      style={[
+        styles.statusText,
+        {
+          color: statusStyle.color,
+        },
+      ]}>
+      {item.status}
+    </Text>
+  </View>
+</View>
 
         {/* Product */}
         <View style={styles.productSection}>
@@ -531,6 +550,27 @@ ListFooterComponent={
 };
 
 const styles = StyleSheet.create({
+  headerLeft: {
+  flex: 1,
+},
+
+customerRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginTop: 7,
+},
+
+customerLabel: {
+  fontSize: 10,
+  fontWeight: '600',
+  marginRight: 6,
+},
+
+customerName: {
+  fontSize: 13,
+  fontWeight: '700',
+  flex: 1,
+},
   container: {
     flex: 1,
   },

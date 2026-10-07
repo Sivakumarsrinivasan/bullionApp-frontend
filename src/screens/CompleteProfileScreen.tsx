@@ -18,6 +18,7 @@ import {useTheme} from '../theme/ThemeProvider';
 import {spacing} from '../theme/spacing';
 import { completeRegistration } from '../services/authService';
 import Toast from 'react-native-toast-message';
+import { saveTokens } from '../services/tokenStorage';
 
 type CompleteProfileNavigationProp =
   NativeStackNavigationProp<
@@ -76,9 +77,18 @@ const handleCompleteProfile = async () => {
 
     console.log('Complete Profile payload:', payload);
 
-    const response = await completeRegistration(payload,registrationToken);
+    const response = await completeRegistration(
+      payload,
+      registrationToken
+    );
 
     console.log('Complete Profile response:', response);
+
+    // Save tokens returned by backend
+    await saveTokens(
+      response.data.accessToken,
+      response.data.refreshToken
+    );
 
     Toast.show({
       type: 'success',
@@ -88,7 +98,12 @@ const handleCompleteProfile = async () => {
         'Registration completed successfully.',
     });
 
-    navigation.navigate('Login');
+    // Remove registration/login screens from navigation history
+    navigation.reset({
+      index: 0,
+      routes: [{name: 'Home'}],
+    });
+
   } catch (error: any) {
     console.log('Complete Profile error:', error);
 

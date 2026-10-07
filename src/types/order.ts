@@ -14,4 +14,5 @@ export interface getOrder {
   total_amount: string | number;
   status: string;
   created_at: string;
+  product_name:string
 }

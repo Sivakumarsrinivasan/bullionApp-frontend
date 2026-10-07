@@ -69,7 +69,9 @@ export const verifyLoginOtp = async (
 
   return response.data;
 };
-
+export const getCurrentUser = async () => {
+  return api.get("/auth/me");
+};
 export const logout = async (refreshToken:string) => {
   const response = await api.post('auth/logout',{
     refreshToken

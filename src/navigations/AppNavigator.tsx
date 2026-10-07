@@ -94,23 +94,31 @@ function AppNavigator() {
   const [initialRoute, setInitialRoute] = useState<InitialRoute | null>(null);
 
   useEffect(() => {
-    const restoreSession = async () => {
-      try {
-        const tokens = await getTokens();
+  const restoreSession = async () => {
+  try {
+    const tokens = await getTokens();
 
-        if (!tokens?.accessToken || !tokens.role) {
-          setInitialRoute('Login');
-          return;
-        }
+    console.log('TOKENS ON APP START:', {
+      hasAccessToken: !!tokens?.accessToken,
+      hasRefreshToken: !!tokens?.refreshToken,
+      role: tokens?.role,
+    });
 
-        setInitialRoute(
-          tokens.role === 'ADMIN' ? 'AdminHome' : 'Home',
-        );
-      } catch (error) {
-        console.log('Session restoration error:', error);
-        setInitialRoute('Login');
-      }
-    };
+    if (!tokens?.accessToken || !tokens?.role) {
+      console.log('SESSION NOT FOUND - OPENING LOGIN');
+      setInitialRoute('Login');
+      return;
+    }
+
+    const route = tokens.role === 'ADMIN' ? 'AdminHome' : 'Home';
+
+    console.log('RESTORING SESSION TO:', route);
+    setInitialRoute(route);
+  } catch (error) {
+    console.log('SESSION RESTORATION ERROR:', error);
+    setInitialRoute('Login');
+  }
+};
 
     restoreSession();
   }, []);

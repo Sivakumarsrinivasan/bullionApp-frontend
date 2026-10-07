@@ -15,23 +15,27 @@ import AppInput from '../components/AppInput';
 import {useTheme} from '../theme/ThemeProvider';
 import {spacing} from '../theme/spacing';
 import Toast from 'react-native-toast-message';
-import { verifyLoginOtp } from '../services/authService';
-import { saveTokens } from '../services/tokenStorage';
-import {RootStackParamList} from '../navigations/AppNavigator'
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+import {verifyLoginOtp} from '../services/authService';
+import {saveTokens, getTokens} from '../services/tokenStorage';
+
+import {RootStackParamList} from '../navigations/AppNavigator';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+
 type OtpScreenProps = NativeStackScreenProps<
   RootStackParamList,
   'Otp'
->
+>;
 
 const OtpScreen = ({route, navigation}: OtpScreenProps) => {
   const {colors} = useTheme();
-const [loading, setLoading] = useState(false);
 
+  const [loading, setLoading] = useState(false);
   const {identifier} = route.params;
 
   const [otp, setOtp] = useState('');
-const [timer, setTimer] = useState(5 * 60);
+  const [timer, setTimer] = useState(5 * 60);
+
   useEffect(() => {
     if (timer === 0) {
       return;
@@ -44,80 +48,91 @@ const [timer, setTimer] = useState(5 * 60);
     return () => clearInterval(interval);
   }, [timer]);
 
-const handleVerifyOtp = async () => {
-  if (otp.length !== 6) {
-    Toast.show({
-      type: 'error',
-      text1: 'Invalid OTP',
-      text2: 'Please enter a valid 6-digit OTP.',
-    });
-    return;
-  }
+  const handleVerifyOtp = async () => {
+    if (otp.length !== 6) {
+      Toast.show({
+        type: 'error',
+        text1: 'Invalid OTP',
+        text2: 'Please enter a valid 6-digit OTP.',
+      });
+      return;
+    }
 
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const isEmail = identifier.includes('@');
+      const isEmail = identifier.includes('@');
 
-    const payload = isEmail
-      ? {
-          email: identifier,
-          otp,
-        }
-      : {
-          mobile: identifier,
-          otp,
-        };
+      const payload = isEmail
+        ? {
+            email: identifier,
+            otp,
+          }
+        : {
+            mobile: identifier,
+            otp,
+          };
 
-    const data = await verifyLoginOtp(payload);
-    // console.log('Login verify response:', response?.data?.accessToken);
-    // console.log('Login verify response:', response?.data?.refreshToken);
-    console.log(data)
-const {
-  accessToken,
-  refreshToken,
-  role,
-} = data.data
-console.log("a1",accessToken);
-console.log("ar1",refreshToken);
-console.log("a12",role);
-await saveTokens(
-  accessToken,
-  refreshToken
-);    
+      const response = await verifyLoginOtp(payload);
 
-  Toast.show({
-  type: 'success',
-  text1: 'Login Successful',
-  text2:
-    role === 'ADMIN'
-      ? 'Welcome Admin'
-      : 'Welcome back',
-});
+      console.log('Login OTP verification successful');
 
-if (role === 'ADMIN') {
-  navigation.replace('AdminHome');
-} else {
-  navigation.replace('Home');
-}
+      const {accessToken, refreshToken, role} = response.data;
 
-    // Token storage → Home
-  } catch (error: any) {
-    console.log('Login OTP verification error:', error.response.data);
+      console.log('Login role:', role);
 
-    const message =
-      error?.response?.data?.message ||
-      'Invalid OTP. Please try again.';
+      if (!accessToken || !refreshToken || !role) {
+        throw new Error('Login response is missing required authentication data');
+      }
 
-    Toast.show({
-      type: 'error',
-      text1: 'Error',
-      text2: message,
-    });
-  } finally {
-    setLoading(false);
-  }
-};
+      // Save access token, refresh token, and role in Keychain
+      await saveTokens(accessToken, refreshToken, role);
+
+      // Verify that credentials were saved successfully
+      const savedTokens = await getTokens();
+
+      console.log('TOKENS AFTER LOGIN:', {
+        hasAccessToken: !!savedTokens?.accessToken,
+        hasRefreshToken: !!savedTokens?.refreshToken,
+        role: savedTokens?.role,
+      });
+
+      if (!savedTokens?.accessToken || !savedTokens?.refreshToken) {
+        throw new Error('Failed to verify saved login credentials');
+      }
+
+      Toast.show({
+        type: 'success',
+        text1: 'Login Successful',
+        text2: role === 'ADMIN' ? 'Welcome Admin' : 'Welcome back',
+      });
+
+      if (role === 'ADMIN') {
+        navigation.replace('AdminHome');
+      } else {
+        navigation.replace('Home');
+      }
+    } catch (error: any) {
+      console.log(
+        'Login OTP verification error:',
+        error?.response?.data ?? error?.message ?? error,
+      );
+
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Invalid OTP. Please try again.';
+
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleResendOtp = () => {
     if (timer > 0) {
       return;
@@ -188,9 +203,7 @@ if (role === 'ADMIN') {
     },
 
     resendLink: {
-      color: timer === 0
-        ? colors.primary
-        : colors.textMuted,
+      color: timer === 0 ? colors.primary : colors.textMuted,
       fontSize: 14,
       fontWeight: '600',
     },
@@ -201,31 +214,23 @@ if (role === 'ADMIN') {
       <KeyboardAvoidingView
         style={{flex: 1}}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-
         <ScrollView
           contentContainerStyle={styles.container}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
-
           <TouchableOpacity
             style={styles.backButton}
             onPress={navigation.goBack}>
-            <Text style={styles.backText}>
-              ← Back
-            </Text>
+            <Text style={styles.backText}>← Back</Text>
           </TouchableOpacity>
 
           <View style={styles.content}>
-            <Text style={styles.title}>
-              Verify OTP
-            </Text>
+            <Text style={styles.title}>Verify OTP</Text>
 
             <Text style={styles.description}>
               We've sent a 6-digit OTP to{' '}
-              <Text style={styles.identifier}>
-                {identifier}
-              </Text>
-              . Enter it below to continue.
+              <Text style={styles.identifier}>{identifier}</Text>.
+              {' '}Enter it below to continue.
             </Text>
 
             <AppInput
@@ -261,14 +266,11 @@ if (role === 'ADMIN') {
                 <TouchableOpacity
                   style={styles.resendButton}
                   onPress={handleResendOtp}>
-                  <Text style={styles.resendLink}>
-                    Resend OTP
-                  </Text>
+                  <Text style={styles.resendLink}>Resend OTP</Text>
                 </TouchableOpacity>
               )}
             </View>
           </View>
-
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

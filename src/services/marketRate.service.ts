@@ -8,7 +8,7 @@ export const getLatestMarketRates = async (): Promise<MarketRate[]> => {
 };
 
 export const refreshMarketRate = async (
-  symbol: 'XAU' | 'XAG',
+  symbol: 'XAU' | 'XAG' | 'GOLD_999' | 'SILVER_999',
 ) => {
   const response = await api.get(
     `rates/market-price/${symbol}`,

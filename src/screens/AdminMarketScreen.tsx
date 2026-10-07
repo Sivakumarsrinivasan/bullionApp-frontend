@@ -85,14 +85,13 @@ const AdminMarketRatesScreen = ({
        * Fetch fresh GOLD price from provider
        * and store it in the backend database.
        */
-      await refreshMarketRate('XAU');
+await refreshMarketRate('GOLD_999');
 
       /*
        * Fetch fresh SILVER price from provider
        * and store it in the backend database.
        */
-      await refreshMarketRate('XAG');
-
+await refreshMarketRate('SILVER_999');
       /*
        * Finally read the latest values from DB.
        */
